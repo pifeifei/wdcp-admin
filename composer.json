@@ -1,0 +1,32 @@
+{
+    "name": "pifeifei/wdcp-admin",
+    "description": "wdcp admin api",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "kislong",
+            "email": "pifeifei1989@qq.com"
+        }
+    ],
+    "require": {
+        "php": "^5.5 | ^7.0",
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "~6.3.0",
+        "symfony/css-selector": "~3.4.0",
+        "symfony/dom-crawler": "~3.4.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.5"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "Pifeifei\\": "src/Pifeifei/"
+        }
+    }
+}
