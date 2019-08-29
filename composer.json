@@ -1,6 +1,7 @@
 {
     "name": "pifeifei/wdcp-admin",
     "description": "wdcp admin api",
+    "homepage": "https://github.com/pifeifei/wdcp-admin",
     "type": "library",
     "license": "MIT",
     "authors": [
