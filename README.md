@@ -1,5 +1,11 @@
 # wdcp 后台 api 调用
 
+> 原因:
+> 因为官方 api 没有列表, 使用有了限制，所以开发了这个
+> 
+> PS: 强烈建议设置 IP 白名单，或对 8080 端口防火墙设置，来提升安全。
+
+
 ### composer 安装
 composer require pifeifei/wdcp-admin
 
