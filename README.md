@@ -17,10 +17,7 @@ composer require pifeifei/wdcp-admin
 $config = [
     'username' => 'api_user',
     'password' => 'wdcpAdmin@123',
-    'uri'      => 'http://localhost:8080/',
-    'ftp_user' => 'api_ftp_user',
-    'ftp_pwd'  => 'wdcpAdmin@123',
-    'ftp_port' => 21,
+    'uri'      => 'http://localhost:8080/'
 ];
 // 创建对象
 $wdcp = new \Pifeifei\WdcpAdmin($config);
@@ -54,7 +51,30 @@ $this->wdcpAdmin->siteHasDomainForSiteId($siteId, 'test1.pp');
 $this->wdcpAdmin->siteDelete($siteId);
 
 // ftp 相关
-// 待写
+// ftp 列表
+$wdcp->ftpList($keyword = '',$page=1);
+
+// ftp搜索, 列表页带有搜索功能
+$wdcp->ftpSearch($keyword='')
+
+$username = 'ftp_username';
+$ftpConfig=[
+    'password' => 'password', // 可以自动生成, 返回参数包含密码,
+    'dir' => "/www/web/{$username}", // 默认是用户名目录, 可自行指定
+];
+$wdcp->ftpAdd($username, $ftpConfig=[]);
+
+// 修改密码, 访问速度等属性
+$wdcp->ftpEdit($ftpId, $data=[]);
+
+// 设置 ftp 状态
+$wdcp->ftpStatus($ftpId, $status=0);
+
+// 删除ftp
+$wdcp->ftpDelete($ftpId);
+
+// 修改 FTP 密码
+$wdcp->ftpChpwd($ftpId, $oldPassword='', $newPassword = '');
 
 // mysql TODO 
 
