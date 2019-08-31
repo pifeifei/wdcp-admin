@@ -80,6 +80,8 @@ $wdcp->ftpChpwd($ftpId, $oldPassword='', $newPassword = '');
 
 ```
 
+> [详细表单介绍 docs/form.md](docs/form.md)
+
 ### 运行测试
 ```shell
 ./vendor/bin/phpunit
