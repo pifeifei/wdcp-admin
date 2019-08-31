@@ -21,17 +21,16 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class WdcpAdmin
 {
+    private $debug = false;
+
+    private $logCallback = false;
+
     private $options =[];
 
     private $defaultOptions =[
+        'uri'      => 'http://localhost:8080',
         'username' => 'admin',
         'password' => 'wdlinux.cn',
-        'uri'      => 'http://localhost:8080',
-        'ftp_user' => 'api_ftp_user',
-        'ftp_pwd'  => '',
-        'ftp_port' => 21,
-        'debug'    => false,
-        'logCallback'=> false,
     ];
 
     /**
@@ -97,11 +96,23 @@ class WdcpAdmin
 
     /**
      * 初始化
-     * @param [type] $option  url|apiKey|apiIp|debug|logCallback
+     *
+     * @param array $options  url|username|password|debug|logCallback
      */
-    public function __construct($options)
+    public function __construct($options = [])
     {
+        if(isset($options['debug'])){
+            $this->debug = $options['debug'];
+            unset($options['debug']);
+        }
+
+        if(isset($options['logCallback'])){
+            $this->logCallback = $options['logCallback'];
+            unset($options['logCallback']);
+        }
+
         $this->options = array_replace($this->defaultOptions, $options);
+
         if(empty($this->options['uri'])){
             $this->errCode = 40001;
             $this->errMsg  = 'uri 不能为空';
@@ -111,7 +122,7 @@ class WdcpAdmin
 //            echo $this->options['uri'];
 //            exit;
         }
-        $this->options['ftp_pwd'] = $this->options['ftp_pwd']===true ? substr(md5($this->options['uri'].'+'.$this->options['ftp_user']),8,15):$this->options['ftp_pwd'];
+        // $this->options['ftp_pwd'] = $this->options['ftp_pwd']===true ? substr(md5($this->options['uri'].'+'.$this->options['ftp_user']),8,15):$this->options['ftp_pwd'];
 
         $this->cookie = new SessionCookieJar($this->options['uri'], true);
         $this->client = new Client([
@@ -391,7 +402,6 @@ class WdcpAdmin
         return $form;
     }
 
-
     /**
      * @param int $siteId
      * @param string $domain
@@ -558,13 +568,31 @@ class WdcpAdmin
     }
 
     /**
+     * @deprecated  请使用 siteSetStatus()
+     * 站点状态修改
+     *
+     * @param int  $siteId  站点ID
+     * @param int|string $status 0,off, disable: 禁用; 1, on, enable: 启用 ,
+     * @param string $domain
+     * @return array
+     */
+    public function siteStatus($siteId, $status=1, $domain='')
+    {
+        if($this->siteSetStatus($siteId, $status, $domain)){
+            return ['err'=>0, 'msg'=>$this->errMsg];
+        } else {
+            return ['err'=>1, 'msg'=>$this->errMsg];
+        }
+    }
+
+    /**
      * 站点状态修改
      * @param int  $siteId  站点ID
      * @param int|string $status 0,off, disable: 禁用; 1, on, enable: 启用 ,
      * @param string $domain
-     * @return array|bool
+     * @return bool
      */
-    public function siteStatus($siteId, $status=1,$domain='')
+    public function siteSetStatus($siteId, $status=1, $domain='')
     {
         if($this->valid() === false){
             return false;
@@ -589,9 +617,11 @@ class WdcpAdmin
         }
 
         if(intval($result['errCode'])===0){
-            return ['err'=>0, 'msg'=>$result['msg']];
+//            return ['err'=>0, 'msg'=>$result['msg']];
+            return true;
         }else{
-            return ['err'=>1, 'msg'=>$result['msg']];
+            $this->setError(41000, $result['msg']);
+            return false;
         }
     }
 
@@ -727,9 +757,12 @@ class WdcpAdmin
 
         if(intval($result['errCode'])===0){
             $data['id'] = @$result['id'];
-            return ['err'=>0, 'msg'=>$result['msg'], 'data'=> $data];
+            return $data;
+//            return ['err'=>0, 'msg'=>$result['msg'], 'data'=> $data];
         }else{
-            return ['err'=>1, 'msg'=>$result['msg']];
+            $this->setError(42000, $result['msg']);
+            return false;
+//            return ['err'=>1, 'msg'=>$result['msg']];
         }
 
     }
@@ -740,7 +773,8 @@ class WdcpAdmin
      * @param array $data [quotasize, quotafiles, ulbandwidth, dlbandwidth]
      * @return array|bool
      */
-    public function ftpEdit($ftpId, $data=[]) {
+    public function ftpEdit($ftpId, $data=[])
+    {
 
         if($this->valid() === false){
             return false;
@@ -777,6 +811,7 @@ class WdcpAdmin
     }
 
     /**
+     * @deprecated  请使用 ftpSetStatus()
      * FTP状态修改
      * @param int        $ftpId
      * @param int|string $status 0,off, disable: 禁用; 1, on, enable: 启用 ,
@@ -784,11 +819,26 @@ class WdcpAdmin
      */
     public function ftpStatus($ftpId, $status=0)
     {
+        if($this->ftpSetStatus($ftpId, $status)){
+            return ['err'=>0, 'msg'=>$this->errMsg];
+        } else {
+            return ['err'=>1, 'msg'=>$this->errMsg];
+        }
+    }
+
+    /**
+     * FTP状态修改
+     * @param int        $ftpId
+     * @param int|string $status 0,off, disable: 禁用; 1, on, enable: 启用 ,
+     * @return bool
+     */
+    public function ftpSetStatus($ftpId, $status=0)
+    {
         if($this->valid() === false){
             return false;
         }
         if(empty($ftpId) || $ftpId<0){
-            $this->errCode = 44444;
+            $this->errCode = 42000;
             $this->errMsg  = 'FTP用户状态: ID 不能为空';
             return false;
         }
@@ -807,9 +857,11 @@ class WdcpAdmin
         }
 
         if(intval($result['errCode'])===0){
-            return ['err'=>0, 'msg'=>$result['msg']];
-        }else{
-            return ['err'=>1, 'msg'=>$result['msg']];
+            return true;
+        } else {
+            $this->errCode = 42000;
+            $this->errMsg = $result['msg'];
+            return false;
         }
     }
 
@@ -917,7 +969,6 @@ class WdcpAdmin
     }
 
 
-
     /**
      * @param string $name
      * @param array $config
@@ -957,6 +1008,30 @@ class WdcpAdmin
     public function getOption()
     {
         return $this->options;
+    }
+
+    /**
+     * TODO : 设置是否开启调试模式
+     *
+     * @param bool $debug
+     * @return $this
+     */
+    public function debug($debug = false)
+    {
+        $this->debug = $debug;
+        return $this;
+    }
+
+    /**
+     * 设置日志记录
+     * @param bool|string $function  普通函数或闭包函数
+     * @return $this
+     */
+    public function setLogCallback($function = false)
+    {
+
+        $this->logCallback = $function;
+        return $this;
     }
 
     /**
@@ -1012,7 +1087,6 @@ class WdcpAdmin
         }
     }
 
-
     /**
      * @param string $method  get post  getJson  postJson
      * @param array  $args
@@ -1038,12 +1112,6 @@ class WdcpAdmin
         try{
             $this->response = $this->client->request($method, $uri, $opts);
         }catch(WdcpRuntimeException $e){
-//            $fileDebugStr = date('Y-m-d H:i:s'). ' ' .PHP_EOL
-//                          . "option " . var_export($this->options, true). ' ' .PHP_EOL
-//                          . "========================================";
-//            file_put_contents(__FILE__.'.log', $fileDebugStr);
-//            throw new WdcpRuntimeException('请求超时, 配置错误或服务器不可访问:'.$this->options['uri'], 500);
-//            exit;
             $this->errCode = 44444;
             $this->errMsg = '请求超时, 配置错误或服务器不可访问:'.$this->options['uri'];
             return false;
@@ -1056,6 +1124,21 @@ class WdcpAdmin
         return $result;
     }
 
+    /**
+     * @param int $errCode
+     * @param string $errMsg
+     * @return $this
+     */
+    private function setError($errCode, $errMsg)
+    {
+        $this->errCode = $errCode;
+        $this->errMsg = $errMsg;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
     public function getError()
     {
         return WdcpAdminErrorCode::getErrText($this->errCode) . $this->errMsg;
@@ -1104,13 +1187,17 @@ class WdcpAdminErrorCode
             40005 => 'keyword 不能为空',
             40008 => '连接超时，连接可能不可用！',
             // 站点
-            40101 => 'siteAdd: 缺少 domain 参数',
-            40201 => 'siteEdit: 缺少站点ID 参数',
-            40301 => 'siteDel: 缺少站点ID 参数',
+            40100 => 'wdcp site error: ',
+            40101 => 'wdcp siteAdd: 缺少 domain 参数',
+            40201 => 'wdcp siteEdit: 缺少站点ID 参数',
+            40301 => 'wdcp siteDel: 缺少站点ID 参数',
             // ftp
+            41000 => 'wdcp ftp error: ',
             41001 => '',
             // mysql
+            42000 => 'wdcp mysql error: ',
             42001 => '',
+
             44444 => '默认, 待写入错误函数',
     );
     public static function getErrText($err) {
