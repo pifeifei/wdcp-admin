@@ -1,9 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: pff
- * Date: 2019-08-26
- * Time: 19:49
+ * Created by pifeifei.
+ * User: pifeifei <pifeifei1989@qq.com>
+ * Date: 2019-08-26 19:49
  */
 
 namespace Tests;
@@ -19,24 +18,20 @@ class WdcpAdminTest extends BaseTestCase
     protected $wdcpAdmin;
 
     protected $wdcpConfig = [
+        'uri'      => 'http://192.168.1.82:53088/',
         'username' => 'api_user',
         'password' => 'wdcpAdmin@123',
-        'uri'      => 'http://192.168.1.82:53088/',
-        'ftp_user' => 'api_ftp_user',
-        'ftp_pwd'  => 'wdcpAdmin@123',
-        'ftp_port' => 21,
-        'debug'    => false,
-        'logCallback'=> false
-    ];
-//    protected $wdcpConfig = [
-//        'username' => 'admin',
-//        'password' => 'wdlinux.cn',
-//        'uri'      => 'http://localhost:8080',
 //        'ftp_user' => 'api_ftp_user',
 //        'ftp_pwd'  => 'wdcpAdmin@123',
 //        'ftp_port' => 21,
 //        'debug'    => false,
-//    ];
+//        'logCallback'=> false
+    ];
+
+    protected $wdcpTestFtpUser = [
+        'username' => '',
+        ''
+    ];
 
     protected $wdcpConfig2 = [];
 
@@ -100,6 +95,13 @@ class WdcpAdminTest extends BaseTestCase
 
     public function testFtp()
     {
-        
+        $ftpInfo = $this->wdcpAdmin->ftpAdd('testFtpUser', [
+            'password' => '1234567890abcde'
+        ]);
+        $this->assertIsArray($ftpInfo);
+
+        $this->assertIsArray($this->wdcpAdmin->ftpList());
+
+        $this->wdcpAdmin->ftpDelete($ftpInfo['id']);
     }
 }
