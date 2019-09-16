@@ -1159,7 +1159,7 @@ class WdcpAdmin
 
     private function getDomain($host = '')
     {
-        preg_match('/[\w-]{1,63}}(\.com|\.gov|\.org|\.net)?\.[a-z]{2,7}$/i', trim(strtolower($host)), $match);
+        preg_match('/[\w-]{1,63}(\.com|\.gov|\.org|\.net)?\.[a-z]{2,7}$/i', trim(strtolower($host)), $match);
         return isset($match[0])? $match[0] : '';
     }
 }
