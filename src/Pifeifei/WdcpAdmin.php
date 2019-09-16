@@ -403,6 +403,7 @@ class WdcpAdmin
     }
 
     /**
+     * 查询站点是否包含某域名
      * @param int $siteId
      * @param string $domain
      * @return bool
@@ -435,7 +436,9 @@ class WdcpAdmin
             $siteDomains = preg_split("/[, ]+/i", $form['domains']);
         }
 
-        if(in_array($domain, $siteDomains) || $domain === $form['domain']){
+        if(in_array($domain, $siteDomains) || $domain === $form['domain']) {
+            return true;
+        }else if(in_array('*.' . $this->getDomain($domain), $siteDomains)){
             return true;
         }else{
             return false;
@@ -543,14 +546,6 @@ class WdcpAdmin
             return false;
         }
 
-        //        $query = ['id'=>$siteId];
-        //        $response = $this->client->get(self::WDCP_SITE_EDIT, ['query'=>$query]);
-        //        $result = $this->responseCheck($response, 'html');
-        //        if($result ===false){
-        //            return false;
-        //        }
-        //        $this->crawler->addContent((string)$result, 'html');
-        //        $form = $this->crawler->filter('[lay-submit]')->form();
         $form = $this->getSiteEditFormArray($siteId);
         if($form ===false){
             return false;
@@ -1160,6 +1155,12 @@ class WdcpAdmin
         }
 
         return $this;
+    }
+
+    private function getDomain($host = '')
+    {
+        preg_match('/[\w-]{1,63}}(\.com|\.gov|\.org|\.net)?\.[a-z]{2,7}$/i', trim(strtolower($host)), $match);
+        return isset($match[0])? $match[0] : '';
     }
 }
 

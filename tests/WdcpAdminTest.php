@@ -18,7 +18,7 @@ class WdcpAdminTest extends BaseTestCase
     protected $wdcpAdmin;
 
     protected $wdcpConfig = [
-        'uri'      => 'http://192.168.1.82:53088/',
+        'uri'      => 'http://192.168.1.82:8080/',
         'username' => 'api_user',
         'password' => 'wdcpAdmin@123',
 //        'ftp_user' => 'api_ftp_user',
@@ -67,7 +67,7 @@ class WdcpAdminTest extends BaseTestCase
         $this->assertEquals($siteInfo['vhostdir'], $siteEditInfo['vhostdir']);
 
         // add domain name for site
-        $addDomains = ['test1.pp', 'test2.pp'];
+        $addDomains = ['test1.pp', 'test2.pp', '*.test3.pp'];
         $siteAddDomain = $this->wdcpAdmin->siteAddDomainForSiteId($siteId, $addDomains);
         $siteEditInfo = $this->wdcpAdmin->getSiteEditFormArray($siteId);
         $this->assertEquals($siteAddDomain['domains'], $siteEditInfo['domains']);
@@ -81,7 +81,8 @@ class WdcpAdminTest extends BaseTestCase
         unset($siteRemoveDomain);
 
         $this->assertFalse($this->wdcpAdmin->siteHasDomainForSiteId($siteId, 'test1.pp'));
-        
+        $this->assertFalse($this->wdcpAdmin->siteHasDomainForSiteId($siteId, 'abc.test3.pp')); // 支持泛解析查询
+
         unset($siteEditInfo, $addDomains, $siteInfo);
 
         // delete site
