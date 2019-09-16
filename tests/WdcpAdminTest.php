@@ -81,7 +81,7 @@ class WdcpAdminTest extends BaseTestCase
         unset($siteRemoveDomain);
 
         $this->assertFalse($this->wdcpAdmin->siteHasDomainForSiteId($siteId, 'test1.pp'));
-        $this->assertFalse($this->wdcpAdmin->siteHasDomainForSiteId($siteId, 'abc.test3.pp')); // 支持泛解析查询
+        $this->assertTrue($this->wdcpAdmin->siteHasDomainForSiteId($siteId, 'abc.test3.pp')); // 支持泛解析查询
 
         unset($siteEditInfo, $addDomains, $siteInfo);
 
