@@ -18,6 +18,7 @@ $config = [
     'username' => 'api_user',
     'password' => 'wdcpAdmin@123',
     'uri'      => 'http://localhost:8080/'
+    // 'cookies' => new \GuzzleHttp\Cookie\FileCookieJar($cookieFile, true) // cookie登录
 ];
 // 创建对象
 $wdcp = new \Pifeifei\WdcpAdmin($config);

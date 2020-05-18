@@ -7,6 +7,7 @@
 
 namespace Tests;
 
+use http\Env;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Pifeifei\WdcpAdmin;
 
@@ -18,10 +19,10 @@ class WdcpAdminTest extends BaseTestCase
     protected $wdcpAdmin;
 
     protected $wdcpConfig = [
-        'uri'      => 'http://192.168.1.82:8080/',
-        'username' => 'api_user',
-        'password' => 'wdcpAdmin@123',
-//        'ftp_user' => 'api_ftp_user',
+//        'uri'      => 'http://192.168.1.73:8080/',
+//        'username' => 'admin',
+//        'password' => 'wdlinux.cn',
+//        'ftp_user' => 'ftp_user',
 //        'ftp_pwd'  => 'wdcpAdmin@123',
 //        'ftp_port' => 21,
 //        'debug'    => false,
@@ -37,6 +38,12 @@ class WdcpAdminTest extends BaseTestCase
 
     public function setUp()
     {
+        $this->wdcpConfig['uri'] = getenv('WDCP_URI');
+        $this->wdcpConfig['username'] = getenv('WDCP_USER');
+        $this->wdcpConfig['password'] = getenv('WDCP_PWD');
+        $this->wdcpConfig['ftp_user'] = getenv('WDCP_FTP_USER');
+        $this->wdcpConfig['ftp_pwd']  = getenv('WDCP_FTP_PWD');
+        $this->wdcpConfig['ftp_port'] = getenv('WDCP_FTP_PORT');
         $this->wdcpAdmin = new WdcpAdmin($this->wdcpConfig);
     }
 

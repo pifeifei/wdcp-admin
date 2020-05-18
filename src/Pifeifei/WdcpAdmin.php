@@ -117,21 +117,14 @@ class WdcpAdmin
             $this->errCode = 40001;
             $this->errMsg  = 'uri 不能为空';
             throw new WdcpRuntimeException($this->errMsg);
-            //return false;
-//        }else{
-//            echo $this->options['uri'];
-//            exit;
         }
-        // $this->options['ftp_pwd'] = $this->options['ftp_pwd']===true ? substr(md5($this->options['uri'].'+'.$this->options['ftp_user']),8,15):$this->options['ftp_pwd'];
 
-        $this->cookie = new SessionCookieJar($this->options['uri'], true);
         $this->client = new Client([
-                'base_uri' => $this->options['uri'], //'http://httpbin.org/', //'http://cs.p/', //
-                'cookies'  => $this->cookie,
+                'base_uri' => $this->options['uri'],
+                'cookies'  => empty($this->options['cookies']) ? true : $this->options['cookies'],
                 'allow_redirects'=> true,
                 'timeout'  => 2,
                 'html_errors'=> false,
-                // 'debug' => true,
             ]);
         // $result = $this->login();
         $this->crawler = new Crawler(null, $this->options['uri']);
@@ -139,10 +132,6 @@ class WdcpAdmin
 
     public function valid()
     {
-//        $response = $this->client->request('GET', self::WDCP_CHECK_LOGIN, ['allow_redirects'=>false]);
-//        if(intval($response->getStatusCode())=== 200){
-//            return true;
-//        }
         $response = $this->client->get(self::WDCP_CHECK_LOGIN,  ['allow_redirects'=>false]);
         $result = $this->responseCheck($response, 'json');
         if($result !== false){
@@ -269,6 +258,10 @@ class WdcpAdmin
      */
     private function getSiteAddAndEditFormArray($siteId = 0)
     {
+        if($this->valid() === false){
+            return false;
+        };
+
         $siteId= intval($siteId);
         if($siteId === 0){
             $response = $this->client->get(self::WDCP_SITE_ADD);
