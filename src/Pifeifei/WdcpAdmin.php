@@ -25,8 +25,17 @@ class WdcpAdmin
 
     private $logCallback = false;
 
+    /* @var array */
     private $options =[];
 
+    /* @var string  */
+    protected $host = 'localhost';
+    /* @var string  */
+    protected $ip = '127.0.0.1';
+    /* @var int  */
+    protected $port = 8080;
+
+    /* @var array  */
     private $defaultOptions =[
         'uri'      => 'http://localhost:8080',
         'username' => 'admin',
@@ -119,6 +128,10 @@ class WdcpAdmin
             throw new WdcpRuntimeException($this->errMsg);
         }
 
+        $this->host = parse_url($this->options['uri'], PHP_URL_HOST);
+        $this->ip = gethostbyname(parse_url($this->options['uri'], PHP_URL_HOST));
+        $this->port = parse_url($this->options['uri'], PHP_URL_PORT);
+
         $this->client = new Client([
                 'base_uri' => $this->options['uri'],
                 'cookies'  => empty($this->options['cookies']) ? true : $this->options['cookies'],
@@ -163,6 +176,30 @@ class WdcpAdmin
 
     // 验证ftp账号密码
     public function validFtp(){}
+
+    /**
+     * @return string
+     */
+    public function getHost()
+    {
+        return $this->host;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIp()
+    {
+        return $this->ip;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPort()
+    {
+        return $this->port;
+    }
 
     /**
      * 查询站点列表
