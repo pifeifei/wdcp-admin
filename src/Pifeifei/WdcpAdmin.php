@@ -136,7 +136,7 @@ class WdcpAdmin
                 'base_uri' => $this->options['uri'],
                 'cookies'  => empty($this->options['cookies']) ? true : $this->options['cookies'],
                 'allow_redirects'=> true,
-                'timeout'  => 2,
+                'timeout'  => 5,
                 'html_errors'=> false,
             ]);
         // $result = $this->login();
@@ -251,7 +251,7 @@ class WdcpAdmin
         }
         $pp = $crawler->filter('.layui-laypage a, .layui-laypage span');
         if($pp->count()>0){
-            $pageTotal= $pp->eq($pp->count()-2)->text();
+            $pageTotal= intval(trim($pp->eq($pp->count()-2)->text(), '.'));
         }else{
             $pageTotal = count($list)>0?1:0;
         }
